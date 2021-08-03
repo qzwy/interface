@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>spring-boot-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <version>2.3.4.RELEASE</version>
+  </parent>
+
+  <groupId>zwy.test</groupId>
+  <artifactId>nocc-interface-test</artifactId>
+  <version>1.0.0</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <properties>
+    <ncc-keys.version>0.5.8</ncc-keys.version>
+    <postgresql.version>42.2.9</postgresql.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+      <version>2.6.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>tf.tibp.ncc</groupId>
+      <artifactId>tibp-ncc-keys</artifactId>
+      <version>${ncc-keys.version}</version>
+    </dependency>
+
+    <!-- postgresql, HAWQ, etc -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.54</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>libs-release</id>
+      <url>http://gitlab:8081/artifactory/libs-release/</url>
+    </repository>
+    <repository>
+      <id>gitlab-central</id>
+      <url>http://gitlab:8081/artifactory/central/</url>
+    </repository>
+    <repository>
+      <id>maven-local</id>
+      <url>http://gitlab:8081/artifactory/maven-local/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>kafka-online</id>
+      <url>https://github.com/spring-projects/spring-kafka</url>
+    </repository>
+  </repositories>
+</project>

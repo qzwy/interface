@@ -1,0 +1,22 @@
+server:
+  port: 10016
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    url: jdbc:postgresql://10.10.49.137:5432/ncc_dev
+    username: szncc
+    password: szncc
+  redis:
+    timeouot: 20000ms
+    cluster:
+      nodes: 10.10.49.121:7001, 10.10.49.122:7001, 10.10.49.123:7001
+      maxRedirects: 5
+      pool:
+        max-active: 1000
+        min-idle: 10
+        max-idle: 20
+        max-wait: -1ms
+      password:
+      application:
+        name: spring-boot-redis
