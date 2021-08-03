@@ -4,13 +4,13 @@ server:
     context-path: /api
 spring:
   datasource:
-    url: jdbc:postgresql://10.10.49.137:5432/ncc_dev
-    username: szncc
-    password: szncc
+    url: jdbc:postgresql://10.200.25.4:25308/ncc_dpc
+    username: tongfang
+    password: Tongfang@123
   redis:
     timeouot: 20000ms
     cluster:
-      nodes: 10.10.49.121:7001, 10.10.49.122:7001, 10.10.49.123:7001
+      nodes: 10.200.24.22:22400,10.200.24.24:22400,10.200.24.26:22400,10.200.24.22:22402,10.200.24.24:22402,10.200.24.26:22402,10.200.24.22:22403,10.200.24.24:22403,10.200.24.26:22403,10.200.24.22:22404,10.200.24.24:22404,10.200.24.26:22404,10.200.24.22:22405,10.200.24.24:22405,10.200.24.26:22405
       maxRedirects: 5
       pool:
         max-active: 1000

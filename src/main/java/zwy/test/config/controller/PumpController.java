@@ -1,11 +1,11 @@
 package zwy.test.config.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xpath.internal.operations.Bool;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -51,83 +51,181 @@ public class PumpController {
           return null;
         });
     Map<String, Object> relation =  new HashMap<>();
+    List<Map<String, Boolean>> property = new ArrayList<>();
+    for(int num = 0; num < split.length; num++){
+      Map<String, Boolean> map  = new HashMap<>();
+      JSONObject equipments = JSONObject.parseObject(JSON.toJSONString(objects.get(num)));
+      equipments.values().forEach(i -> {
+        JSONObject jsonObject = JSONObject.parseObject(i.toString());
+        if(jsonObject.getString("value").length() == 1){
+          map.put(jsonObject.getString("point").split("_")[2], changeToBool(jsonObject.getString("value")));
+        }
+      });
+      property.add(map);
+    }
+    System.out.println("property = " + property);
+
+    Map<String, Integer> status = new HashMap<>();
 
     //计算
     for(int num = 0; num < split.length; num++){
-      //1号线
-      JSONObject equipments = JSONObject.parseObject(objects.get(num).toString());
-      if (split[num].contains("1BGB")){
-        //红色
-        Object alarmst = JSONObject.parseObject(equipments.get(split[num] + "_AlarmSt").toString())
-            .get("value");
-        Object levelst = JSONObject.parseObject(equipments.get(split[num] + "_LevelSt").toString())
-            .get("value");
-        Object level1st = JSONObject.parseObject(equipments.get(split[num] + "_Level1St").toString())
-            .get("value");
-        if(changeToBool(alarmst.toString()) || changeToBool(levelst.toString()) || changeToBool(level1st.toString())){
-          //todo 红色
-          continue;
-        }else{
-
-          //黄色
-          Object failerst = JSONObject.parseObject(equipments.get(split[num] + "_FailerSt").toString())
-              .get("value");
-          Object failer1st = JSONObject.parseObject(equipments.get(split[num] + "_Failer1St").toString())
-              .get("value");
-          Object failer2st = JSONObject.parseObject(equipments.get(split[num] + "_Failer2St").toString())
-              .get("value");
-          Object failer3st = JSONObject.parseObject(equipments.get(split[num] + "_Failer3St").toString())
-              .get("value");
-
+      Map<String, Boolean> stringBooleanMap = property.get(num);
+      System.out.println("stringBooleanMap = " + stringBooleanMap);
+      try {
+        //1号线
+        if (split[num].contains("1BGB")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("OpenSt") || stringBooleanMap.get("Open1St") || stringBooleanMap.get("Open2St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("OpenSt") && !stringBooleanMap.get("Open1St") && !stringBooleanMap.get("Open2St"))) {
+            status.put(split[num], 3);
+          }
+          if (stringBooleanMap.get("FailerSt") || stringBooleanMap.get("Failer1St") || stringBooleanMap.get("Failer2St") || stringBooleanMap.get("Failer3St")) {
+            status.put(split[num], 2);
+          }
+          if (stringBooleanMap.get("AlarmSt") || stringBooleanMap.get("LevelSt") || stringBooleanMap.get("Level1St")) {
+            status.put(split[num], 1);
+          }
+        }
+        if (split[num].contains("1BAY")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("OpenSt") || stringBooleanMap.get("Open1St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("OpenSt") && !stringBooleanMap.get("Open1St"))) {
+            status.put(split[num], 3);
+          }
+          if (stringBooleanMap.get("FailerSt") || stringBooleanMap.get("Failer1St") || stringBooleanMap.get("Failer2St")) {
+            status.put(split[num], 2);
+          }
+          if (stringBooleanMap.get("AlarmSt") || stringBooleanMap.get("LevelSt")) {
+            status.put(split[num], 1);
+          }
         }
 
-      }
-      if (split[num].contains("1BAY")){
+        //2号线
+        if (split[num].contains("2BGB")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("OpenSt") || stringBooleanMap.get("Open1St") || stringBooleanMap.get("Open2St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("OpenSt") && !stringBooleanMap.get("Open1St") && !stringBooleanMap.get("Open2St"))) {
+            status.put(split[num], 3);
+          }
+          if (stringBooleanMap.get("FailerSt") || stringBooleanMap.get("Failer1St") || stringBooleanMap.get("Failer2St")) {
+            status.put(split[num], 2);
+          }
+          if (stringBooleanMap.get("AlarmSt") || stringBooleanMap.get("LevelSt")) {
+            status.put(split[num], 1);
+          }
+        }
+        if (split[num].contains("2BAY")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("OpenSt") || stringBooleanMap.get("Open1St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("OpenSt") && !stringBooleanMap.get("Open1St"))) {
+            status.put(split[num], 3);
+          }
+          if (stringBooleanMap.get("FailerSt") || stringBooleanMap.get("Failer1St")) {
+            status.put(split[num], 2);
+          }
+          if (stringBooleanMap.get("AlarmSt") || stringBooleanMap.get("LevelSt")) {
+            status.put(split[num], 1);
+          }
+        }
+        if (split[num].contains("2BGI")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("OpenSt") || stringBooleanMap.get("Open1St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("OpenSt") && !stringBooleanMap.get("Open1St"))) {
+            status.put(split[num], 3);
+          }
+          if (stringBooleanMap.get("FailerSt") || stringBooleanMap.get("Failer1St")) {
+            status.put(split[num], 2);
+          }
+          if ((stringBooleanMap.get("LevelSt") || !stringBooleanMap.get("LevelSt"))) {
+            status.put(split[num], 1);
+          }
+        }
 
-      }
+        //3号线
+        if (split[num].contains("3BGA")) {
+          status.put(split[num], 0);
+          if (!stringBooleanMap.get("H01St") || !stringBooleanMap.get("H02St")) {
+            status.put(split[num], 4);
+          }
+          if (stringBooleanMap.get("H01St") && stringBooleanMap.get("H02St")) {
+            status.put(split[num], 3);
+          }
+          if (!stringBooleanMap.get("H08St") || !stringBooleanMap.get("H09St")) {
+            status.put(split[num], 2);
+          }
+          if (!stringBooleanMap.get("iHHLevSt") || !stringBooleanMap.get("iLLLevSt")) {
+            status.put(split[num], 1);
+          }
+        }
+        if (split[num].contains("3BGC")) {
+          status.put(split[num], 0);
+          if (!stringBooleanMap.get("H01St") || !stringBooleanMap.get("H02St") || !stringBooleanMap.get("H03St")) {
+            status.put(split[num], 4);
+          }
+          if (stringBooleanMap.get("H01St") && stringBooleanMap.get("H02St") && stringBooleanMap.get("H03St")) {
+            status.put(split[num], 3);
+          }
+          if (!stringBooleanMap.get("H08St") || !stringBooleanMap.get("H09St") || !stringBooleanMap.get("H10St")) {
+            status.put(split[num], 2);
+          }
+          if (!stringBooleanMap.get("iHHLevSt") || !stringBooleanMap.get("iLLLevSt")) {
+            status.put(split[num], 1);
+          }
+        }
 
-      //2号线
-      if (split[num].contains("2BGB")){
+        //4号线
+        if (split[num].contains("BQJB")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("iRun1St") || stringBooleanMap.get("iRun2St") || stringBooleanMap.get("iRun3St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("iRun1St") && !stringBooleanMap.get("iRun2St") && !stringBooleanMap.get("iRun3St"))) {
+            status.put(split[num], 3);
 
-      }
-      if (split[num].contains("2BAY")){
-
-      }
-      if (split[num].contains("2BGI")){
-
-      }
-
-      //3号线
-      if (split[num].contains("3BGA")){
-
-      }
-      if (split[num].contains("3BGC")){
-
-      }
-
-      //4号线
-      if (split[num].contains("BQJB")){
-
-      }
-      if (split[num].contains("BFSB")){
-
+          }
+          if (stringBooleanMap.get("iFault1St") || stringBooleanMap.get("iFault2St") || stringBooleanMap.get("iFault3St")) {
+            status.put(split[num], 2);
+          }
+          if (stringBooleanMap.get("iHHLevSt") || stringBooleanMap.get("iLLLevSt")) {
+            status.put(split[num], 1);
+          }
+        }
+        if (split[num].contains("BFSB")) {
+          status.put(split[num], 0);
+          if (stringBooleanMap.get("iRun1St") || stringBooleanMap.get("iRun2St")) {
+            status.put(split[num], 4);
+          }
+          if ((!stringBooleanMap.get("iRun1St") && !stringBooleanMap.get("iRun2St"))) {
+            status.put(split[num], 3);
+          }
+          if (stringBooleanMap.get("iFault1St") || stringBooleanMap.get("iFault2St")) {
+            status.put(split[num], 2);
+          }
+          if (stringBooleanMap.get("iHHLevSt") || stringBooleanMap.get("iLLLevSt")) {
+            status.put(split[num], 1);
+          }
+        }
+      }catch (Exception e){
+        e.printStackTrace();
       }
     }
 
-
-
-
-
-
-
-//    for(int num = 0; num < split.length; num++){
-//      relation.put(split[num], objects.get(num));
-//    }
-
-
-
-
-    return ResponseEntity.ok(relation);
+    StringBuilder sb = new StringBuilder();
+    for (Map.Entry<String, Integer> i : status.entrySet()){
+      sb.append(i.getKey()).append("-").append(i.getValue()).append("|");
+    }
+    sb.toString();
+    return ResponseEntity.ok(sb);
 
   }
 
